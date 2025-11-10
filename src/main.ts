@@ -142,7 +142,7 @@ function addCellEventListener(inputCell: MapCell) {
     if (
       currentPlayerData.marker.getLatLng().distanceTo(
         inputCell.rect!.getBounds().getCenter(),
-      ) > 0.0003
+      ) < 25
     ) {
       if (
         (inputCell.token !== undefined) &&
