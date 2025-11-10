@@ -12,3 +12,9 @@ import "./_leafletWorkaround.ts"; // fixes for missing Leaflet images
 //import luck from "./_luck.ts";
 
 // Create basic UI elements
+
+// Div for containing all elements in this script
+
+const mainDiv = document.createElement("div");
+mainDiv.id = "mainDiv";
+document.body.append(mainDiv);
