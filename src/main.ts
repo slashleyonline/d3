@@ -114,7 +114,20 @@ function createCell(position: leaflet.LatLng): MapCell {
   );
 
   newCell.rect!.addEventListener("click", () => {
-    transferTokenToPlayer(newCell);
+    if (
+      currentPlayerData.marker.getLatLng().distanceTo(
+        newCell.rect!.getBounds().getCenter(),
+      ) > 0.0003
+    ) {
+      if (
+        (newCell.token !== undefined) &&
+        (currentPlayerData.token_held === undefined)
+      ) {
+        transferTokenToPlayer(newCell);
+      } else {
+        transferTokenToCell(newCell);
+      }
+    }
   });
 
   newCell.rect!.addTo(map);
@@ -139,7 +152,9 @@ function spawnCellsGrid() {
 }
 
 function transferTokenToPlayer(cell: MapCell) {
-  if (cell.token !== undefined) {
+  if (
+    (cell.token !== undefined) && (currentPlayerData.token_held === undefined)
+  ) {
     //transfer token from cell to player
     currentPlayerData.token_held = { value: cell.token.value };
     delete cell.token;
@@ -153,6 +168,35 @@ function transferTokenToPlayer(cell: MapCell) {
       "Player picked up token of value ",
       currentPlayerData.token_held?.value,
     );
+  }
+}
+
+function transferTokenToCell(cell: MapCell) {
+  if (
+    (cell.token !== undefined) && (currentPlayerData.token_held !== undefined)
+  ) {
+    console.log(cell.token.value);
+    console.log(currentPlayerData.token_held.value);
+    if (cell.token.value == currentPlayerData.token_held.value) {
+      //tokens match, do nothing
+      cell.token.value *= 2;
+      cell.label!.setIcon(leaflet.divIcon({
+        html: `<div class="icon">${cell.token.value}</div>`,
+        className: "cellIcon",
+      }));
+      delete currentPlayerData.token_held;
+    }
+  } else if (
+    (cell.token === undefined) && (currentPlayerData.token_held !== undefined)
+  ) {
+    //transfer token from player to cell
+    cell.token = { value: currentPlayerData.token_held.value };
+    delete currentPlayerData.token_held;
+
+    cell.label!.setIcon(leaflet.divIcon({
+      html: `<div class="icon">${cell.token.value}</div>`,
+      className: "cellIcon",
+    }));
   }
 }
 
