@@ -26,6 +26,11 @@ const mapDiv = document.createElement("div");
 mapDiv.id = "map";
 mainDiv.append(mapDiv);
 
+const playerStatusDiv = document.createElement("div");
+playerStatusDiv.id = "playerStatusDiv";
+mainDiv.append(playerStatusDiv);
+playerStatusDiv.innerHTML = "Current token: None";
+
 // Our classroom location
 const CLASSROOM_LATLNG = leaflet.latLng(
   36.997936938057016,
