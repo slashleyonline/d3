@@ -109,18 +109,17 @@ function createCell(inputPosition: leaflet.LatLng): MapCell {
     ]),
     token: { value: 1 },
   };
-
   newCell.label = createIcon(
     String(newCell.token!.value),
     newCell.rect!.getBounds().getCenter(),
   );
-
   addCellEventListener(newCell);
-
   newCell.rect!.addTo(map);
 
   return newCell;
 }
+
+// thank you auto-formatter. very cool
 
 function addCellEventListener(inputCell: MapCell) {
   inputCell.rect!.addEventListener("click", () => {
