@@ -1,5 +1,5 @@
 // @deno-types="npm:@types/leaflet"
-//import leaflet from "leaflet";
+import leaflet from "leaflet";
 
 // Style sheets
 import "leaflet/dist/leaflet.css"; // supporting style for Leaflet
@@ -19,6 +19,35 @@ const mainDiv = document.createElement("div");
 mainDiv.id = "mainDiv";
 document.body.append(mainDiv);
 
+//Div containing the leaflet map
+
 const mapDiv = document.createElement("div");
-mapDiv.id = "mapDiv";
+mapDiv.id = "map";
 mainDiv.append(mapDiv);
+/*
+// Our classroom location
+const CLASSROOM_LATLNG = leaflet.latLng(
+  36.997936938057016,
+  -122.05703507501151,
+);
+
+// Tunable gameplay parameters
+
+const GAMEPLAY_ZOOM_LEVEL = 19;
+//made 1e-4 for the 0.0001 degree requirement
+const TILE_DEGREES = 1e-4;
+//size of the area for spawning chaches
+//const NEIGHBORHOOD_SIZE = 8;
+//const CACHE_SPAWN_PROBABILITY = 0.1;
+
+// Create the map 
+
+const map = leaflet.map(mapDiv, {
+  center: CLASSROOM_LATLNG,
+  zoom: GAMEPLAY_ZOOM_LEVEL,
+  minZoom: GAMEPLAY_ZOOM_LEVEL,
+  maxZoom: GAMEPLAY_ZOOM_LEVEL,
+  zoomControl: false,
+  scrollWheelZoom: false,
+});
+*/
