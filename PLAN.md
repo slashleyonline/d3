@@ -25,7 +25,8 @@ Key gameplay challenge: Can players collect and craft tokens from nearby locatio
 - [x] use loops to draw a whole grid of cells on the map
 - [x] make cells clickable
 - [x] make cells contain visual representation of tokens
-- [ ] make cells give tokens to player upon clicking
+- [x] make cells give tokens to player upon clicking
+- [ ] ensure player can only hold one token
 - [ ] allow player to deposit token
 - [ ] allow player to craft larger tokens
 - [ ] win condition for player score reaching 256
