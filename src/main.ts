@@ -37,7 +37,7 @@ const GAMEPLAY_ZOOM_LEVEL = 19;
 //made 1e-4 for the 0.0001 degree requirement
 //const TILE_DEGREES = 1e-4;
 //size of the area for spawning chaches
-//const NEIGHBORHOOD_SIZE = 8;
+const NEIGHBORHOOD_SIZE = 8;
 //const CACHE_SPAWN_PROBABILITY = 0.1;
 
 //interface for map cell
@@ -91,7 +91,7 @@ function mapSetup() {
   return newMap;
 }
 
-function createCell(): MapCell {
+function createCell(position: leaflet.LatLng): MapCell {
   const newCell: MapCell = {
     //need to set token as a random value later
     position: currentPlayerData.position,
@@ -99,10 +99,10 @@ function createCell(): MapCell {
     //need to make the position value random later
 
     rect: leaflet.rectangle([
-      [currentPlayerData.position.lat, currentPlayerData.position.lng],
+      [position.lat, position.lng],
       [
-        currentPlayerData.position.lat + 0.0001,
-        currentPlayerData.position.lng + 0.0001,
+        position.lat + 0.0001,
+        position.lng + 0.0001,
       ],
     ]),
   };
@@ -110,4 +110,17 @@ function createCell(): MapCell {
   return newCell;
 }
 
-createCell();
+function spawnCellsGrid() {
+  for (let i = -NEIGHBORHOOD_SIZE; i < NEIGHBORHOOD_SIZE; i++) {
+    for (let j = -NEIGHBORHOOD_SIZE; j < NEIGHBORHOOD_SIZE; j++) {
+      //create cell at offset position
+      const tilePosition = leaflet.latLng(
+        CLASSROOM_LATLNG.lat + i * 0.0001,
+        CLASSROOM_LATLNG.lng + j * 0.0001,
+      );
+      createCell(tilePosition);
+    }
+  }
+}
+
+spawnCellsGrid();
