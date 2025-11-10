@@ -57,24 +57,34 @@ interface PlayerData {
   token_held?: Token;
 }
 
+const currentPlayerData: PlayerData = {
+  position: CLASSROOM_LATLNG,
+  marker: leaflet.marker(CLASSROOM_LATLNG),
+};
+
 // Create the map
 
-const map = leaflet.map(mapDiv, {
-  center: CLASSROOM_LATLNG,
-  zoom: GAMEPLAY_ZOOM_LEVEL,
-  minZoom: GAMEPLAY_ZOOM_LEVEL,
-  maxZoom: GAMEPLAY_ZOOM_LEVEL,
-  zoomControl: false,
-  scrollWheelZoom: false,
-});
+function mapSetup() {
+  const map = leaflet.map(mapDiv, {
+    center: CLASSROOM_LATLNG,
+    zoom: GAMEPLAY_ZOOM_LEVEL,
+    minZoom: GAMEPLAY_ZOOM_LEVEL,
+    maxZoom: GAMEPLAY_ZOOM_LEVEL,
+    zoomControl: false,
+    scrollWheelZoom: false,
+  });
 
-// Populate the map with a background tile layer
-leaflet
-  .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution:
-      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  })
-  .addTo(map);
+  // Populate the map with a background tile layer
+  leaflet
+    .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    })
+    .addTo(map);
 
-  
+  currentPlayerData.marker.bindTooltip("That's you!");
+  currentPlayerData.marker.addTo(map);
+}
+
+mapSetup();
