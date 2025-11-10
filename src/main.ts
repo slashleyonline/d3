@@ -63,10 +63,12 @@ const currentPlayerData: PlayerData = {
   marker: leaflet.marker(CLASSROOM_LATLNG),
 };
 
+const map: leaflet.Map = mapSetup();
+
 // Create the map
 
 function mapSetup() {
-  const map = leaflet.map(mapDiv, {
+  const newMap = leaflet.map(mapDiv, {
     center: CLASSROOM_LATLNG,
     zoom: GAMEPLAY_ZOOM_LEVEL,
     minZoom: GAMEPLAY_ZOOM_LEVEL,
@@ -82,15 +84,14 @@ function mapSetup() {
       attribution:
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     })
-    .addTo(map);
+    .addTo(newMap);
 
   currentPlayerData.marker.bindTooltip("That's you!");
-  currentPlayerData.marker.addTo(map);
-
-  createCell(map);
+  currentPlayerData.marker.addTo(newMap);
+  return newMap;
 }
 
-function createCell(map: leaflet.Map): MapCell {
+function createCell(): MapCell {
   const newCell: MapCell = {
     //need to set token as a random value later
     position: currentPlayerData.position,
@@ -109,4 +110,4 @@ function createCell(map: leaflet.Map): MapCell {
   return newCell;
 }
 
-mapSetup();
+createCell();
