@@ -7,6 +7,7 @@ import "./style.css"; // student-controlled page style
 
 // Fix missing marker images
 import "./_leafletWorkaround.ts"; // fixes for missing Leaflet images
+import luck from "./_luck.ts";
 
 // Import our luck function
 //import luck from "./_luck.ts";
@@ -37,7 +38,8 @@ const GAMEPLAY_ZOOM_LEVEL = 19;
 //made 1e-4 for the 0.0001 degree requirement
 //const TILE_DEGREES = 1e-4;
 //size of the area for spawning chaches
-const NEIGHBORHOOD_SIZE = 8;
+const NEIGHBORHOOD_HEIGHT = 8;
+const NEIGHBORHOOD_WIDTH = 28;
 //const CACHE_SPAWN_PROBABILITY = 0.1;
 
 //interface for map cell
@@ -111,14 +113,17 @@ function createCell(position: leaflet.LatLng): MapCell {
 }
 
 function spawnCellsGrid() {
-  for (let i = -NEIGHBORHOOD_SIZE; i < NEIGHBORHOOD_SIZE; i++) {
-    for (let j = -NEIGHBORHOOD_SIZE; j < NEIGHBORHOOD_SIZE; j++) {
-      //create cell at offset position
-      const tilePosition = leaflet.latLng(
-        CLASSROOM_LATLNG.lat + i * 0.0001,
-        CLASSROOM_LATLNG.lng + j * 0.0001,
-      );
-      createCell(tilePosition);
+  for (let i = -NEIGHBORHOOD_HEIGHT; i < NEIGHBORHOOD_HEIGHT; i++) {
+    for (let j = -NEIGHBORHOOD_WIDTH; j < NEIGHBORHOOD_WIDTH; j++) {
+      const seed = `${i}, ${j}`;
+      if (luck(seed) < 0.25) {
+        //create cell at offset position
+        const tilePosition = leaflet.latLng(
+          CLASSROOM_LATLNG.lat + i * 0.0001,
+          CLASSROOM_LATLNG.lng + j * 0.0001,
+        );
+        createCell(tilePosition);
+      }
     }
   }
 }
