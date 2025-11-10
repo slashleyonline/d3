@@ -108,6 +108,11 @@ function createCell(position: leaflet.LatLng): MapCell {
       ],
     ]),
   };
+
+  newCell.rect!.addEventListener("click", () => {
+    console.log("cell clicked at ", position);
+  });
+
   newCell.rect!.addTo(map);
   return newCell;
 }
