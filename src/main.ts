@@ -24,7 +24,7 @@ document.body.append(mainDiv);
 const mapDiv = document.createElement("div");
 mapDiv.id = "map";
 mainDiv.append(mapDiv);
-/*
+
 // Our classroom location
 const CLASSROOM_LATLNG = leaflet.latLng(
   36.997936938057016,
@@ -35,12 +35,29 @@ const CLASSROOM_LATLNG = leaflet.latLng(
 
 const GAMEPLAY_ZOOM_LEVEL = 19;
 //made 1e-4 for the 0.0001 degree requirement
-const TILE_DEGREES = 1e-4;
+//const TILE_DEGREES = 1e-4;
 //size of the area for spawning chaches
 //const NEIGHBORHOOD_SIZE = 8;
 //const CACHE_SPAWN_PROBABILITY = 0.1;
 
-// Create the map 
+//interface for map cell
+
+interface Token {
+  value: number;
+}
+
+interface MapCell {
+  token?: number;
+  cacheMarker?: leaflet.Marker;
+}
+
+interface PlayerData {
+  position: leaflet.LatLng;
+  marker: leaflet.Marker;
+  token_held?: Token;
+}
+
+// Create the map
 
 const map = leaflet.map(mapDiv, {
   center: CLASSROOM_LATLNG,
@@ -50,4 +67,14 @@ const map = leaflet.map(mapDiv, {
   zoomControl: false,
   scrollWheelZoom: false,
 });
-*/
+
+// Populate the map with a background tile layer
+leaflet
+  .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution:
+      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  })
+  .addTo(map);
+
+  
