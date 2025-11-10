@@ -18,3 +18,7 @@ import "./_leafletWorkaround.ts"; // fixes for missing Leaflet images
 const mainDiv = document.createElement("div");
 mainDiv.id = "mainDiv";
 document.body.append(mainDiv);
+
+const mapDiv = document.createElement("div");
+mapDiv.id = "mapDiv";
+mainDiv.append(mapDiv);
