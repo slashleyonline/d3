@@ -37,6 +37,15 @@ const CLASSROOM_LATLNG = leaflet.latLng(
   -122.05703507501151,
 );
 
+addEventListener("tokenChanged", () => {
+  if (currentPlayerData.token_held !== undefined) {
+    playerStatusDiv.innerHTML = "Current token: " +
+      currentPlayerData.token_held?.value.toString();
+  } else {
+    playerStatusDiv.innerHTML = "Current token: None";
+  }
+});
+
 // Tunable gameplay parameters
 
 const GAMEPLAY_ZOOM_LEVEL = 19;
@@ -72,6 +81,8 @@ const currentPlayerData: PlayerData = {
   position: CLASSROOM_LATLNG,
   marker: leaflet.marker(CLASSROOM_LATLNG),
 };
+
+const tokenChangedEvent = new CustomEvent("tokenChanged");
 
 const map: leaflet.Map = mapSetup();
 
@@ -142,6 +153,7 @@ function addCellEventListener(inputCell: MapCell) {
         transferTokenToCell(inputCell);
       }
     }
+    dispatchEvent(tokenChangedEvent);
   });
 }
 
