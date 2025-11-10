@@ -49,9 +49,10 @@ interface Token {
 }
 
 interface MapCell {
-  token?: number;
+  token?: Token;
   position: leaflet.LatLng;
   rect?: leaflet.Rectangle;
+  label?: leaflet.SVGOverlay;
 }
 
 interface PlayerData {
@@ -97,9 +98,6 @@ function createCell(position: leaflet.LatLng): MapCell {
   const newCell: MapCell = {
     //need to set token as a random value later
     position: currentPlayerData.position,
-
-    //need to make the position value random later
-
     rect: leaflet.rectangle([
       [position.lat, position.lng],
       [
@@ -107,13 +105,17 @@ function createCell(position: leaflet.LatLng): MapCell {
         position.lng + 0.0001,
       ],
     ]),
+    token: { value: 1 },
   };
 
+  setIcon(String(newCell.token!.value), newCell.rect!.getBounds().getCenter());
+
   newCell.rect!.addEventListener("click", () => {
-    console.log("cell clicked at ", position);
+    transferTokenToPlayer(newCell);
   });
 
   newCell.rect!.addTo(map);
+
   return newCell;
 }
 
@@ -131,6 +133,30 @@ function spawnCellsGrid() {
       }
     }
   }
+}
+
+function transferTokenToPlayer(cell: MapCell) {
+  if (cell.token !== undefined) {
+    //transfer token from cell to player
+    currentPlayerData.token_held = { value: cell.token.value };
+    delete cell.token;
+    console.log(
+      "Player picked up token of value ",
+      currentPlayerData.token_held?.value,
+    );
+  }
+}
+
+function setIcon(iconInput: string, position: leaflet.LatLng) {
+  const icon = leaflet.divIcon({
+    html: `<div class="icon">${iconInput}</div>`,
+    className: "cellIcon",
+  });
+  const marker = leaflet.marker(position, {
+    icon: icon,
+    interactive: false,
+  });
+  marker.addTo(map);
 }
 
 spawnCellsGrid();
