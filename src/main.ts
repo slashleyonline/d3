@@ -48,7 +48,8 @@ interface Token {
 
 interface MapCell {
   token?: number;
-  cacheMarker?: leaflet.Marker;
+  position: leaflet.LatLng;
+  rect?: leaflet.Rectangle;
 }
 
 interface PlayerData {
@@ -85,6 +86,27 @@ function mapSetup() {
 
   currentPlayerData.marker.bindTooltip("That's you!");
   currentPlayerData.marker.addTo(map);
+
+  createCell(map);
+}
+
+function createCell(map: leaflet.Map): MapCell {
+  const newCell: MapCell = {
+    //need to set token as a random value later
+    position: currentPlayerData.position,
+
+    //need to make the position value random later
+
+    rect: leaflet.rectangle([
+      [currentPlayerData.position.lat, currentPlayerData.position.lng],
+      [
+        currentPlayerData.position.lat + 0.0001,
+        currentPlayerData.position.lng + 0.0001,
+      ],
+    ]),
+  };
+  newCell.rect!.addTo(map);
+  return newCell;
 }
 
 mapSetup();
