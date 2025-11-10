@@ -114,17 +114,11 @@ function createCell(position: leaflet.LatLng): MapCell {
   );
 
   newCell.rect!.addEventListener("click", () => {
-    if (
-      currentPlayerData.marker.getLatLng().distanceTo(
-        newCell.rect!.getBounds().getCenter(),
-      ) > 0.0003
-    ) {
-      if (
-        (newCell.token !== undefined) &&
-        (currentPlayerData.token_held === undefined)
-      ) {
+    if (currentPlayerData.marker.getLatLng().distanceTo(newCell.rect!.getBounds().getCenter()) > 0.0003) {
+      if ((newCell.token !== undefined) && (currentPlayerData.token_held === undefined)) {
         transferTokenToPlayer(newCell);
-      } else {
+      }
+      else {
         transferTokenToCell(newCell);
       }
     }
@@ -139,7 +133,7 @@ function spawnCellsGrid() {
   for (let i = -NEIGHBORHOOD_HEIGHT; i < NEIGHBORHOOD_HEIGHT; i++) {
     for (let j = -NEIGHBORHOOD_WIDTH; j < NEIGHBORHOOD_WIDTH; j++) {
       const seed = `${i}, ${j}`;
-      if (luck(seed) < 0.25) {
+      if (luck(seed) < 0.18){
         //create cell at offset position
         const tilePosition = leaflet.latLng(
           CLASSROOM_LATLNG.lat + i * 0.0001,
@@ -152,65 +146,51 @@ function spawnCellsGrid() {
 }
 
 function transferTokenToPlayer(cell: MapCell) {
-  if (
-    (cell.token !== undefined) && (currentPlayerData.token_held === undefined)
-  ) {
+  if ((cell.token !== undefined)  && (currentPlayerData.token_held === undefined)) {
     //transfer token from cell to player
     currentPlayerData.token_held = { value: cell.token.value };
     delete cell.token;
 
-    cell.label!.setIcon(leaflet.divIcon({
-      html: `<div class="icon"></div>`,
-      className: "cellIcon",
-    }));
-
-    console.log(
-      "Player picked up token of value ",
-      currentPlayerData.token_held?.value,
-    );
+    cell.label!.setIcon(setIconString(" "));
   }
 }
 
 function transferTokenToCell(cell: MapCell) {
-  if (
-    (cell.token !== undefined) && (currentPlayerData.token_held !== undefined)
-  ) {
+  if ((cell.token !== undefined) && (currentPlayerData.token_held !== undefined)) {
     console.log(cell.token.value);
     console.log(currentPlayerData.token_held.value);
     if (cell.token.value == currentPlayerData.token_held.value) {
+      
       //tokens match, do nothing
       cell.token.value *= 2;
-      cell.label!.setIcon(leaflet.divIcon({
-        html: `<div class="icon">${cell.token.value}</div>`,
-        className: "cellIcon",
-      }));
+      cell.label!.setIcon(setIconString(String(cell.token.value)));
       delete currentPlayerData.token_held;
     }
-  } else if (
-    (cell.token === undefined) && (currentPlayerData.token_held !== undefined)
-  ) {
+  }
+  else if ((cell.token === undefined) && (currentPlayerData.token_held !== undefined)) {
     //transfer token from player to cell
     cell.token = { value: currentPlayerData.token_held.value };
     delete currentPlayerData.token_held;
 
-    cell.label!.setIcon(leaflet.divIcon({
-      html: `<div class="icon">${cell.token.value}</div>`,
-      className: "cellIcon",
-    }));
+    cell.label!.setIcon(setIconString(String(cell.token.value)));
   }
 }
 
 function createIcon(iconInput: string, position: leaflet.LatLng) {
-  const icon = leaflet.divIcon({
-    html: `<div class="icon">${iconInput}</div>`,
-    className: "cellIcon",
-  });
   const marker = leaflet.marker(position, {
-    icon: icon,
+    icon: setIconString(iconInput),
     interactive: false,
   });
   marker.addTo(map);
   return marker;
+}
+
+function setIconString(iconInput: string) : leaflet.DivIcon {
+  const icon = leaflet.divIcon({
+    html: `<div class="icon">${iconInput}</div>`,
+    className: "cellIcon",
+  });
+  return icon;
 }
 
 spawnCellsGrid();
