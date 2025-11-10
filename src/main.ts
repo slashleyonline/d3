@@ -42,11 +42,13 @@ const NEIGHBORHOOD_HEIGHT = 8;
 const NEIGHBORHOOD_WIDTH = 28;
 //const CACHE_SPAWN_PROBABILITY = 0.1;
 
-//interface for map cell
+// will keep as a data type for now but if there are no more attributes, it can be removed
 
 interface Token {
   value: number;
 }
+
+//Area on the map that potentially stores a token
 
 interface MapCell {
   token?: Token;
@@ -94,15 +96,15 @@ function mapSetup() {
   return newMap;
 }
 
-function createCell(position: leaflet.LatLng): MapCell {
+//function for defining a cell on the map
+function createCell(inputPosition: leaflet.LatLng): MapCell {
   const newCell: MapCell = {
-    //need to set token as a random value later
-    position: currentPlayerData.position,
+    position: inputPosition,
     rect: leaflet.rectangle([
-      [position.lat, position.lng],
+      [inputPosition.lat, inputPosition.lng],
       [
-        position.lat + 0.0001,
-        position.lng + 0.0001,
+        inputPosition.lat + 0.0001,
+        inputPosition.lng + 0.0001,
       ],
     ]),
     token: { value: 1 },
@@ -113,27 +115,37 @@ function createCell(position: leaflet.LatLng): MapCell {
     newCell.rect!.getBounds().getCenter(),
   );
 
-  newCell.rect!.addEventListener("click", () => {
-    if (currentPlayerData.marker.getLatLng().distanceTo(newCell.rect!.getBounds().getCenter()) > 0.0003) {
-      if ((newCell.token !== undefined) && (currentPlayerData.token_held === undefined)) {
-        transferTokenToPlayer(newCell);
-      }
-      else {
-        transferTokenToCell(newCell);
-      }
-    }
-  });
+  addCellEventListener(newCell);
 
   newCell.rect!.addTo(map);
 
   return newCell;
 }
 
+function addCellEventListener(inputCell: MapCell) {
+  inputCell.rect!.addEventListener("click", () => {
+    if (
+      currentPlayerData.marker.getLatLng().distanceTo(
+        inputCell.rect!.getBounds().getCenter(),
+      ) > 0.0003
+    ) {
+      if (
+        (inputCell.token !== undefined) &&
+        (currentPlayerData.token_held === undefined)
+      ) {
+        transferTokenToPlayer(inputCell);
+      } else {
+        transferTokenToCell(inputCell);
+      }
+    }
+  });
+}
+
 function spawnCellsGrid() {
   for (let i = -NEIGHBORHOOD_HEIGHT; i < NEIGHBORHOOD_HEIGHT; i++) {
     for (let j = -NEIGHBORHOOD_WIDTH; j < NEIGHBORHOOD_WIDTH; j++) {
       const seed = `${i}, ${j}`;
-      if (luck(seed) < 0.18){
+      if (luck(seed) < 0.18) {
         //create cell at offset position
         const tilePosition = leaflet.latLng(
           CLASSROOM_LATLNG.lat + i * 0.0001,
@@ -146,7 +158,9 @@ function spawnCellsGrid() {
 }
 
 function transferTokenToPlayer(cell: MapCell) {
-  if ((cell.token !== undefined)  && (currentPlayerData.token_held === undefined)) {
+  if (
+    (cell.token !== undefined) && (currentPlayerData.token_held === undefined)
+  ) {
     //transfer token from cell to player
     currentPlayerData.token_held = { value: cell.token.value };
     delete cell.token;
@@ -156,18 +170,19 @@ function transferTokenToPlayer(cell: MapCell) {
 }
 
 function transferTokenToCell(cell: MapCell) {
-  if ((cell.token !== undefined) && (currentPlayerData.token_held !== undefined)) {
+  if (
+    (cell.token !== undefined) && (currentPlayerData.token_held !== undefined)
+  ) {
     console.log(cell.token.value);
     console.log(currentPlayerData.token_held.value);
     if (cell.token.value == currentPlayerData.token_held.value) {
-      
-      //tokens match, do nothing
       cell.token.value *= 2;
       cell.label!.setIcon(setIconString(String(cell.token.value)));
       delete currentPlayerData.token_held;
     }
-  }
-  else if ((cell.token === undefined) && (currentPlayerData.token_held !== undefined)) {
+  } else if (
+    (cell.token === undefined) && (currentPlayerData.token_held !== undefined)
+  ) {
     //transfer token from player to cell
     cell.token = { value: currentPlayerData.token_held.value };
     delete currentPlayerData.token_held;
@@ -185,7 +200,7 @@ function createIcon(iconInput: string, position: leaflet.LatLng) {
   return marker;
 }
 
-function setIconString(iconInput: string) : leaflet.DivIcon {
+function setIconString(iconInput: string): leaflet.DivIcon {
   const icon = leaflet.divIcon({
     html: `<div class="icon">${iconInput}</div>`,
     className: "cellIcon",
