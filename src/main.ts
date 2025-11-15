@@ -103,12 +103,14 @@ const currentPlayerData: PlayerData = {
 const tokenChangedEvent = new CustomEvent("tokenChanged");
 
 const map: leaflet.Map = mapSetup();
+const cellsMap = new Map<string, MapCell>();
 
 map.addEventListener("move", () => {
   if (debugMode) {
     currentPlayerData.moveTo(map.getCenter());
   }
   console.log(map.getBounds());
+  spawnCellsLocation();
 });
 
 // Create the map
@@ -192,11 +194,30 @@ function spawnCellsGrid() {
   for (let i = -NEIGHBORHOOD_HEIGHT; i < NEIGHBORHOOD_HEIGHT; i++) {
     for (let j = -NEIGHBORHOOD_WIDTH; j < NEIGHBORHOOD_WIDTH; j++) {
       //create cell at offset position
+      console.log("creating cell");
       const tilePosition = leaflet.latLng(
         CLASSROOM_LATLNG.lat + i * 0.0001,
         CLASSROOM_LATLNG.lng + j * 0.0001,
       );
       createCell(tilePosition);
+    }
+  }
+}
+
+function spawnCellsLocation() {
+  const bounds = map.getBounds();
+  const north = Math.ceil(bounds.getNorth() / 0.0001);
+  const south = Math.floor(bounds.getSouth() / 0.0001);
+  const east = Math.ceil(bounds.getEast() / 0.0001);
+  const west = Math.floor(bounds.getWest() / 0.0001);
+
+  for (let lat = south; lat < north; lat++) {
+    for (let lng = west; lng < east; lng++) {
+      const tilePosition = leaflet.latLng(lat * 0.0001, lng * 0.0001);
+      const key = `${tilePosition.lat},${tilePosition.lng}`;
+      if (!cellsMap.has(key)) {
+        cellsMap.set(key, createCell(tilePosition));
+      }
     }
   }
 }
@@ -255,4 +276,4 @@ function setIconString(iconInput: string): leaflet.DivIcon {
   return icon;
 }
 
-spawnCellsGrid();
+spawnCellsLocation();

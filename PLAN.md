@@ -32,4 +32,5 @@ Key gameplay challenge: Can players collect and craft tokens from nearby locatio
 - [x] win condition for player score reaching 8
 - [x] player movement by scrolling on map
 - [x] position-based cell spawning
+- [x] infinite grid
 - [ ] cells that reach across the world, without memory
