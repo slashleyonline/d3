@@ -54,6 +54,9 @@ const GAMEPLAY_ZOOM_LEVEL = 19;
 //size of the area for spawning chaches
 const NEIGHBORHOOD_HEIGHT = 8;
 const NEIGHBORHOOD_WIDTH = 28;
+
+const debugMode = true;
+
 //const CACHE_SPAWN_PROBABILITY = 0.1;
 
 // will keep as a data type for now but if there are no more attributes, it can be removed
@@ -75,16 +78,25 @@ interface PlayerData {
   position: leaflet.LatLng;
   marker: leaflet.Marker;
   token_held?: Token;
+  moveTo(newPosition: leaflet.LatLng): void;
 }
 
 const currentPlayerData: PlayerData = {
   position: CLASSROOM_LATLNG,
   marker: leaflet.marker(CLASSROOM_LATLNG),
+  moveTo(newPosition: leaflet.LatLng) {
+    this.position = newPosition;
+    this.marker.setLatLng(newPosition);
+  },
 };
 
 const tokenChangedEvent = new CustomEvent("tokenChanged");
 
 const map: leaflet.Map = mapSetup();
+
+map.addEventListener("move", () => {
+  currentPlayerData.moveTo(map.getCenter());
+});
 
 // Create the map
 
