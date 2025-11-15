@@ -106,7 +106,8 @@ map.addEventListener("move", () => {
   if (debugMode) {
     currentPlayerData.moveTo(map.getCenter());
   }
-  console.log(map.getBounds());
+  console.log("total cells: ", cellsMap.size);
+  removeCellsOutsideView();
   spawnCellsLocation();
 });
 
@@ -239,6 +240,21 @@ function transferTokenToCell(cell: MapCell) {
     delete currentPlayerData.token_held;
 
     cell.label!.setIcon(setIconString(String(cell.token.value)));
+  }
+}
+
+function removeCellsOutsideView() {
+  const bounds = map.getBounds();
+  for (const [key, cell] of cellsMap) {
+    if (!bounds.contains(cell.position)) {
+      if (cell.rect !== undefined) {
+        map.removeLayer(cell.rect);
+      }
+      if (cell.label !== undefined) {
+        map.removeLayer(cell.label);
+      }
+      cellsMap.delete(key);
+    }
   }
 }
 
