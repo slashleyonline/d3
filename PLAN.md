@@ -29,6 +29,7 @@ Key gameplay challenge: Can players collect and craft tokens from nearby locatio
 - [x] ensure player can only hold one token
 - [x] allow player to deposit token
 - [x] allow player to craft larger tokens
-- [ ] win condition for player score reaching 256
+- [ ] win condition for player score reaching 8
 - [x] player movement by scrolling on map
+- [x] position-based cell spawning
 - [ ] cells that reach across the world, without memory

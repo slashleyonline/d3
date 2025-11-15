@@ -31,6 +31,14 @@ playerStatusDiv.id = "playerStatusDiv";
 mainDiv.append(playerStatusDiv);
 playerStatusDiv.innerHTML = "Current token: None";
 
+const winnerDiv = document.createElement("div");
+winnerDiv.id = "winnerDiv";
+winnerDiv.innerHTML = "You win!";
+winnerDiv.style.fontSize = "48px";
+winnerDiv.style.color = "red";
+winnerDiv.style.display = "none";
+mainDiv.append(winnerDiv);
+
 // Our classroom location
 const CLASSROOM_LATLNG = leaflet.latLng(
   36.997936938057016,
@@ -54,6 +62,7 @@ const GAMEPLAY_ZOOM_LEVEL = 19;
 //size of the area for spawning chaches
 const NEIGHBORHOOD_HEIGHT = 8;
 const NEIGHBORHOOD_WIDTH = 28;
+const WIN_SCORE = 8;
 
 const debugMode = true;
 
@@ -130,21 +139,27 @@ function mapSetup() {
 function createCell(inputPosition: leaflet.LatLng): MapCell {
   const newCell: MapCell = {
     position: inputPosition,
-    rect: leaflet.rectangle([
+    token: { value: 0 },
+  };
+  const seed = `${inputPosition.lat}, ${inputPosition.lng}`;
+
+  if (luck(seed) < 0.18) {
+    newCell.token = { value: 1 };
+    newCell.rect = leaflet.rectangle([
       [inputPosition.lat, inputPosition.lng],
       [
         inputPosition.lat + 0.0001,
         inputPosition.lng + 0.0001,
       ],
-    ]),
-    token: { value: 1 },
-  };
-  newCell.label = createIcon(
-    String(newCell.token!.value),
-    newCell.rect!.getBounds().getCenter(),
-  );
-  addCellEventListener(newCell);
-  newCell.rect!.addTo(map);
+    ]);
+
+    newCell.label = createIcon(
+      String(newCell.token!.value),
+      newCell.rect.getBounds().getCenter(),
+    );
+    addCellEventListener(newCell);
+    newCell.rect!.addTo(map);
+  }
 
   return newCell;
 }
@@ -174,15 +189,12 @@ function addCellEventListener(inputCell: MapCell) {
 function spawnCellsGrid() {
   for (let i = -NEIGHBORHOOD_HEIGHT; i < NEIGHBORHOOD_HEIGHT; i++) {
     for (let j = -NEIGHBORHOOD_WIDTH; j < NEIGHBORHOOD_WIDTH; j++) {
-      const seed = `${i}, ${j}`;
-      if (luck(seed) < 0.18) {
-        //create cell at offset position
-        const tilePosition = leaflet.latLng(
-          CLASSROOM_LATLNG.lat + i * 0.0001,
-          CLASSROOM_LATLNG.lng + j * 0.0001,
-        );
-        createCell(tilePosition);
-      }
+      //create cell at offset position
+      const tilePosition = leaflet.latLng(
+        CLASSROOM_LATLNG.lat + i * 0.0001,
+        CLASSROOM_LATLNG.lng + j * 0.0001,
+      );
+      createCell(tilePosition);
     }
   }
 }
@@ -193,6 +205,9 @@ function transferTokenToPlayer(cell: MapCell) {
   ) {
     //transfer token from cell to player
     currentPlayerData.token_held = { value: cell.token.value };
+    if (currentPlayerData.token_held.value >= WIN_SCORE) {
+      winnerDiv.style.display = "block";
+    }
     delete cell.token;
 
     cell.label!.setIcon(setIconString(" "));
