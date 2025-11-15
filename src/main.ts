@@ -1,3 +1,6 @@
+//D3.B COMPLETE!!!!
+
+
 // @deno-types="npm:@types/leaflet"
 import leaflet from "leaflet";
 
@@ -55,7 +58,6 @@ addEventListener("tokenChanged", () => {
 });
 
 // Tunable gameplay parameters
-
 const GAMEPLAY_ZOOM_LEVEL = 19;
 //made 1e-4 for the 0.0001 degree requirement
 //const TILE_DEGREES = 1e-4;
