@@ -62,8 +62,9 @@ const GAMEPLAY_ZOOM_LEVEL = 19;
 //size of the area for spawning chaches
 const NEIGHBORHOOD_HEIGHT = 8;
 const NEIGHBORHOOD_WIDTH = 28;
-const WIN_SCORE = 8;
+const WIN_SCORE = 8; // temporary, will move to 256 later
 
+// Debug mode flag - when true, player position follows map center
 const debugMode = true;
 
 //const CACHE_SPAWN_PROBABILITY = 0.1;
@@ -107,6 +108,7 @@ map.addEventListener("move", () => {
   if (debugMode) {
     currentPlayerData.moveTo(map.getCenter());
   }
+  console.log(map.getBounds());
 });
 
 // Create the map
