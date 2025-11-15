@@ -59,7 +59,7 @@ addEventListener("tokenChanged", () => {
 const GAMEPLAY_ZOOM_LEVEL = 19;
 //made 1e-4 for the 0.0001 degree requirement
 //const TILE_DEGREES = 1e-4;
-const WIN_SCORE = 8; // temporary, will move to 256 later
+const WIN_SCORE = 16; // temporary, will move to 256 later
 
 // Debug mode flag - when true, player position follows map center
 const debugMode = true;
