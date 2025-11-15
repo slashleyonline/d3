@@ -59,9 +59,6 @@ addEventListener("tokenChanged", () => {
 const GAMEPLAY_ZOOM_LEVEL = 19;
 //made 1e-4 for the 0.0001 degree requirement
 //const TILE_DEGREES = 1e-4;
-//size of the area for spawning chaches
-const NEIGHBORHOOD_HEIGHT = 8;
-const NEIGHBORHOOD_WIDTH = 28;
 const WIN_SCORE = 8; // temporary, will move to 256 later
 
 // Debug mode flag - when true, player position follows map center
@@ -188,20 +185,6 @@ function addCellEventListener(inputCell: MapCell) {
     }
     dispatchEvent(tokenChangedEvent);
   });
-}
-
-function spawnCellsGrid() {
-  for (let i = -NEIGHBORHOOD_HEIGHT; i < NEIGHBORHOOD_HEIGHT; i++) {
-    for (let j = -NEIGHBORHOOD_WIDTH; j < NEIGHBORHOOD_WIDTH; j++) {
-      //create cell at offset position
-      console.log("creating cell");
-      const tilePosition = leaflet.latLng(
-        CLASSROOM_LATLNG.lat + i * 0.0001,
-        CLASSROOM_LATLNG.lng + j * 0.0001,
-      );
-      createCell(tilePosition);
-    }
-  }
 }
 
 function spawnCellsLocation() {
