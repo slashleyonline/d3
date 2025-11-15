@@ -95,7 +95,9 @@ const tokenChangedEvent = new CustomEvent("tokenChanged");
 const map: leaflet.Map = mapSetup();
 
 map.addEventListener("move", () => {
-  currentPlayerData.moveTo(map.getCenter());
+  if (debugMode) {
+    currentPlayerData.moveTo(map.getCenter());
+  }
 });
 
 // Create the map
