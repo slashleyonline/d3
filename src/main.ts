@@ -79,12 +79,8 @@ interface MapCell {
   token?: Token;
   position: leaflet.LatLng;
   rect?: leaflet.Rectangle;
+  visible?: boolean;
   label?: leaflet.Marker;
-}
-
-interface MapRect {
-  rect: leaflet.Rectangle;
-  visible: boolean;
 }
 
 interface PlayerData {
@@ -142,43 +138,41 @@ function mapSetup() {
   return newMap;
 }
 
+function createRectangle(inputPosition: leaflet.LatLng): leaflet.Rectangle {
+  const rectangle: leaflet.Rectangle = leaflet.rectangle([
+    [inputPosition.lat, inputPosition.lng],
+    [inputPosition.lat + 0.0001, inputPosition.lng + 0.0001],
+  ]);
+  return rectangle;
+}
+
 //function for defining a cell on the map
 function createCell(inputPosition: leaflet.LatLng): MapCell {
   const newCell: MapCell = {
     position: inputPosition,
     token: { value: 0 },
+    visible: true,
   };
   const seed = `${inputPosition.lat}, ${inputPosition.lng}`;
 
   if (luck(seed) < 0.18) {
     newCell.token = { value: 1 };
-    newCell.rect = leaflet.rectangle([
-      [inputPosition.lat, inputPosition.lng],
-      [
-        inputPosition.lat + 0.0001,
-        inputPosition.lng + 0.0001,
-      ],
-    ]);
+    newCell.rect = createRectangle(inputPosition);
 
     newCell.label = createIcon(
       String(newCell.token!.value),
       newCell.rect.getBounds().getCenter(),
     );
     addCellEventListener(newCell);
-    newCell.rect!.addTo(map);
+    newCell.rect.addTo(map);
   }
 
   return newCell;
 }
 
 function RestoreCell(inputCell: MapCell) {
-  inputCell.rect = leaflet.rectangle([
-    [inputCell.position.lat, inputCell.position.lng],
-    [
-      inputCell.position.lat + 0.0001,
-      inputCell.position.lng + 0.0001,
-    ],
-  ]);
+  inputCell.rect = createRectangle(inputCell.position);
+
   if (inputCell.token !== undefined) {
     inputCell.label = createIcon(
       String(inputCell.token!.value),
@@ -186,6 +180,7 @@ function RestoreCell(inputCell: MapCell) {
     );
     addCellEventListener(inputCell);
   }
+  inputCell.visible = true;
   inputCell.rect!.addTo(map);
 }
 
@@ -224,10 +219,7 @@ function spawnCellsLocation() {
       if (!cellsMap.has(key)) {
         cellsMap.set(key, createCell(tilePosition));
       } else {
-        if (
-          (cellsMap.get(key)!.token?.value !== 0) &&
-          (cellsMap.get(key)!.token?.value !== 1)
-        ) {
+        if (cellsMap.get(key)!.visible === false) {
           RestoreCell(cellsMap.get(key)!);
         }
       }
@@ -278,12 +270,12 @@ function removeCellsOutsideView() {
   const bounds = map.getBounds();
   for (const [key, cell] of cellsMap) {
     if (!bounds.contains(cell.position) && cell.token !== undefined) {
-      if (cell.rect !== undefined) {
+      if (cell.rect && cell.label) {
         map.removeLayer(cell.rect);
-      }
-      if (cell.label !== undefined) {
         map.removeLayer(cell.label);
       }
+      cell.visible = false;
+
       if (cell.token!.value == 1 || cell.token!.value == 0) {
         cellsMap.delete(key);
       }
