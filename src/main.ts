@@ -107,7 +107,6 @@ map.addEventListener("move", () => {
   if (debugMode) {
     currentPlayerData.moveTo(map.getCenter());
   }
-  console.log("total cells: ", cellsMap.size);
   removeCellsOutsideView();
   spawnCellsLocation();
 });
@@ -246,8 +245,6 @@ function transferTokenToCell(cell: MapCell) {
   if (
     (cell.token !== undefined) && (currentPlayerData.token_held !== undefined)
   ) {
-    console.log(cell.token.value);
-    console.log(currentPlayerData.token_held.value);
     if (cell.token.value == currentPlayerData.token_held.value) {
       cell.token.value *= 2;
       cell.label!.setIcon(setIconString(String(cell.token.value)));
