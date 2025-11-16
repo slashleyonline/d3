@@ -249,14 +249,14 @@ function transferTokenToCell(cell: MapCell) {
 function removeCellsOutsideView() {
   const bounds = map.getBounds();
   for (const [key, cell] of cellsMap) {
-    if (!bounds.contains(cell.position)) {
+    if (!bounds.contains(cell.position) && cell.token !== undefined) {
       if (cell.rect !== undefined) {
         map.removeLayer(cell.rect);
       }
       if (cell.label !== undefined) {
         map.removeLayer(cell.label);
       }
-      if (cell.token?.value == 1 || cell.token?.value == 0) {
+      if (cell.token!.value == 1 || cell.token!.value == 0) {
         cellsMap.delete(key);
       }
     }
