@@ -217,8 +217,8 @@ function transferTokenToPlayer(cell: MapCell) {
       winnerDiv.style.display = "block";
     }
     delete cell.token;
-
     cell.label!.setIcon(setIconString(" "));
+    cellsMap.set(String(cell.position), cell);
   }
 }
 
@@ -241,22 +241,22 @@ function transferTokenToCell(cell: MapCell) {
     delete currentPlayerData.token_held;
 
     cell.label!.setIcon(setIconString(String(cell.token.value)));
+
+    cellsMap.set(String(cell.position), cell);
   }
 }
 
 function removeCellsOutsideView() {
   const bounds = map.getBounds();
   for (const [key, cell] of cellsMap) {
-
     if (!bounds.contains(cell.position)) {
-      
-      if (cell.token !== undefined && cell.token!.value == 1) {
-        if (cell.rect !== undefined) {
-          map.removeLayer(cell.rect);
-        }
-        if (cell.label !== undefined) {
-          map.removeLayer(cell.label);
-        }
+      if (cell.rect !== undefined) {
+        map.removeLayer(cell.rect);
+      }
+      if (cell.label !== undefined) {
+        map.removeLayer(cell.label);
+      }
+      if (cell.token?.value == 1 || cell.token?.value == 0) {
         cellsMap.delete(key);
       }
     }
