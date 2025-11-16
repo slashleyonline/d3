@@ -1,6 +1,5 @@
 //D3.B COMPLETE!!!!
 
-
 // @deno-types="npm:@types/leaflet"
 import leaflet from "leaflet";
 
@@ -248,7 +247,10 @@ function transferTokenToCell(cell: MapCell) {
 function removeCellsOutsideView() {
   const bounds = map.getBounds();
   for (const [key, cell] of cellsMap) {
-    if (!bounds.contains(cell.position)) {
+    if (
+      !bounds.contains(cell.position) &&
+      (cell.token !== undefined && cell.token!.value == 1)
+    ) {
       if (cell.rect !== undefined) {
         map.removeLayer(cell.rect);
       }
