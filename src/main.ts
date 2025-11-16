@@ -247,17 +247,18 @@ function transferTokenToCell(cell: MapCell) {
 function removeCellsOutsideView() {
   const bounds = map.getBounds();
   for (const [key, cell] of cellsMap) {
-    if (
-      !bounds.contains(cell.position) &&
-      (cell.token !== undefined && cell.token!.value == 1)
-    ) {
-      if (cell.rect !== undefined) {
-        map.removeLayer(cell.rect);
+
+    if (!bounds.contains(cell.position)) {
+      
+      if (cell.token !== undefined && cell.token!.value == 1) {
+        if (cell.rect !== undefined) {
+          map.removeLayer(cell.rect);
+        }
+        if (cell.label !== undefined) {
+          map.removeLayer(cell.label);
+        }
+        cellsMap.delete(key);
       }
-      if (cell.label !== undefined) {
-        map.removeLayer(cell.label);
-      }
-      cellsMap.delete(key);
     }
   }
 }
