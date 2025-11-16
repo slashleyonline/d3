@@ -82,6 +82,11 @@ interface MapCell {
   label?: leaflet.Marker;
 }
 
+interface MapRect {
+  rect: leaflet.Rectangle;
+  visible: boolean;
+}
+
 interface PlayerData {
   position: leaflet.LatLng;
   marker: leaflet.Marker;
@@ -99,7 +104,6 @@ const currentPlayerData: PlayerData = {
 };
 
 const tokenChangedEvent = new CustomEvent("tokenChanged");
-
 const map: leaflet.Map = mapSetup();
 const cellsMap = new Map<string, MapCell>();
 
@@ -167,7 +171,23 @@ function createCell(inputPosition: leaflet.LatLng): MapCell {
   return newCell;
 }
 
-// thank you auto-formatter. very cool
+function RestoreCell(inputCell: MapCell) {
+  inputCell.rect = leaflet.rectangle([
+    [inputCell.position.lat, inputCell.position.lng],
+    [
+      inputCell.position.lat + 0.0001,
+      inputCell.position.lng + 0.0001,
+    ],
+  ]);
+  if (inputCell.token !== undefined) {
+    inputCell.label = createIcon(
+      String(inputCell.token!.value),
+      inputCell.rect.getBounds().getCenter(),
+    );
+    addCellEventListener(inputCell);
+  }
+  inputCell.rect!.addTo(map);
+}
 
 function addCellEventListener(inputCell: MapCell) {
   inputCell.rect!.addEventListener("click", () => {
@@ -200,8 +220,16 @@ function spawnCellsLocation() {
     for (let lng = west; lng < east; lng++) {
       const tilePosition = leaflet.latLng(lat * 0.0001, lng * 0.0001);
       const key = `${tilePosition.lat},${tilePosition.lng}`;
+
       if (!cellsMap.has(key)) {
         cellsMap.set(key, createCell(tilePosition));
+      } else {
+        if (
+          (cellsMap.get(key)!.token?.value !== 0) &&
+          (cellsMap.get(key)!.token?.value !== 1)
+        ) {
+          RestoreCell(cellsMap.get(key)!);
+        }
       }
     }
   }
