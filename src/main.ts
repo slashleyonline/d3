@@ -1,4 +1,4 @@
-//D3.B COMPLETE!!!!
+//D3.C COMPLETE!!!!
 
 // @deno-types="npm:@types/leaflet"
 import leaflet from "leaflet";
@@ -101,6 +101,8 @@ const currentPlayerData: PlayerData = {
 
 const tokenChangedEvent = new CustomEvent("tokenChanged");
 const map: leaflet.Map = mapSetup();
+
+//Dictionary of all map cells onscreen, preserving only modified cells
 const cellsMap = new Map<string, MapCell>();
 
 map.addEventListener("move", () => {
@@ -168,6 +170,8 @@ function createCell(inputPosition: leaflet.LatLng): MapCell {
 
   return newCell;
 }
+
+//function for restoring a cell that was removed from the map, the "memento".
 
 function RestoreCell(inputCell: MapCell) {
   inputCell.rect = createRectangle(inputCell.position);
@@ -272,6 +276,9 @@ function removeCellsOutsideView() {
         map.removeLayer(cell.label);
       }
       cell.visible = false;
+      
+      //this is where the flyweight pattern is applied.
+      //most cells are either 1 or 0, preserving only the data for modified cells.
 
       if (cell.token!.value == 1 || cell.token!.value == 0) {
         cellsMap.delete(key);
