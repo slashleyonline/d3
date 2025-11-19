@@ -11,11 +11,6 @@ import "./style.css"; // student-controlled page style
 import "./_leafletWorkaround.ts"; // fixes for missing Leaflet images
 import luck from "./_luck.ts";
 
-// Import our luck function
-//import luck from "./_luck.ts";
-
-// Create basic UI elements
-
 // Div for containing all elements in this script
 
 const mainDiv = document.createElement("div");
@@ -46,15 +41,6 @@ const CLASSROOM_LATLNG = leaflet.latLng(
   36.997936938057016,
   -122.05703507501151,
 );
-
-addEventListener("tokenChanged", () => {
-  if (currentPlayerData.token_held !== undefined) {
-    playerStatusDiv.innerHTML = "Current token: " +
-      currentPlayerData.token_held?.value.toString();
-  } else {
-    playerStatusDiv.innerHTML = "Current token: None";
-  }
-});
 
 // Tunable gameplay parameters
 const GAMEPLAY_ZOOM_LEVEL = 19;
@@ -113,6 +99,40 @@ map.addEventListener("move", () => {
   spawnCellsLocation();
 });
 
+addEventListener("tokenChanged", () => {
+  if (currentPlayerData.token_held !== undefined) {
+    playerStatusDiv.innerHTML = "Current token: " +
+      currentPlayerData.token_held?.value.toString();
+
+    localStorage.setItem(
+      "playerToken",
+      (currentPlayerData.token_held!).value!.toString(),
+    );
+  } else {
+    playerStatusDiv.innerHTML = "Current token: None";
+    localStorage.setItem(
+      "playerToken",
+      "NaN",
+    );
+  }
+
+  localStorage.setItem(
+    "cellsMap",
+    JSON.stringify(
+      Array.from(
+        cellsMap.entries().map(([key, cell]) => {
+          const value = {
+            value: cell.token?.value,
+            key: key,
+          };
+          console.log("key is " + key);
+          return JSON.stringify(value);
+        }),
+      ),
+    ),
+  );
+});
+
 // Create the map
 
 function mapSetup() {
@@ -148,7 +168,7 @@ function createRectangle(inputPosition: leaflet.LatLng): leaflet.Rectangle {
 }
 
 //function for defining a cell on the map
-function createCell(inputPosition: leaflet.LatLng): MapCell {
+function genCell(inputPosition: leaflet.LatLng): MapCell {
   const newCell: MapCell = {
     position: inputPosition,
     token: { value: 0 },
@@ -171,20 +191,53 @@ function createCell(inputPosition: leaflet.LatLng): MapCell {
   return newCell;
 }
 
+function createCell(
+  inputPosition: leaflet.LatLng,
+  tokenValue: number,
+): MapCell {
+  const newCell: MapCell = {
+    position: inputPosition,
+    visible: true,
+    token: { value: tokenValue },
+  };
+
+  if (tokenValue === -1) {
+    console.log("this time im really gonna do it");
+    delete newCell.token;
+    newCell.rect = createRectangle(inputPosition);
+    newCell.label = createIcon(
+      " ",
+      newCell.rect!.getBounds().getCenter(),
+    );
+  } else if (tokenValue > 0) {
+    newCell.rect = createRectangle(inputPosition);
+    newCell.label = createIcon(
+      String(newCell.token!.value),
+      newCell.rect!.getBounds().getCenter(),
+    );
+  }
+
+  newCell.rect!.addTo(map);
+  addCellEventListener(newCell);
+
+  return newCell;
+}
+
 //function for restoring a cell that was removed from the map, the "memento".
 
 function RestoreCell(inputCell: MapCell) {
-  inputCell.rect = createRectangle(inputCell.position);
-
   if (inputCell.token !== undefined) {
-    inputCell.label = createIcon(
-      String(inputCell.token!.value),
-      inputCell.rect.getBounds().getCenter(),
-    );
-    addCellEventListener(inputCell);
+    if (inputCell.token.value > 0) {
+      inputCell.rect = createRectangle(inputCell.position);
+      inputCell.label = createIcon(
+        String(inputCell.token!.value),
+        inputCell.rect.getBounds().getCenter(),
+      );
+      inputCell.visible = true;
+      inputCell.rect!.addTo(map);
+      addCellEventListener(inputCell);
+    }
   }
-  inputCell.visible = true;
-  inputCell.rect!.addTo(map);
 }
 
 function addCellEventListener(inputCell: MapCell) {
@@ -220,7 +273,7 @@ function spawnCellsLocation() {
       const key = `${tilePosition.lat},${tilePosition.lng}`;
 
       if (!cellsMap.has(key)) {
-        cellsMap.set(key, createCell(tilePosition));
+        cellsMap.set(key, genCell(tilePosition));
       } else {
         if (cellsMap.get(key)!.visible === false) {
           RestoreCell(cellsMap.get(key)!);
@@ -241,7 +294,7 @@ function transferTokenToPlayer(cell: MapCell) {
     }
     delete cell.token;
     cell.label!.setIcon(setIconString(" "));
-    cellsMap.set(String(cell.position), cell);
+    cellsMap.set(String(`${cell.position.lat},${cell.position.lng}`), cell);
   }
 }
 
@@ -263,7 +316,7 @@ function transferTokenToCell(cell: MapCell) {
 
     cell.label!.setIcon(setIconString(String(cell.token.value)));
 
-    cellsMap.set(String(cell.position), cell);
+    cellsMap.set(String(`${cell.position.lat},${cell.position.lng}`), cell);
   }
 }
 
@@ -276,7 +329,7 @@ function removeCellsOutsideView() {
         map.removeLayer(cell.label);
       }
       cell.visible = false;
-      
+
       //this is where the flyweight pattern is applied.
       //most cells are either 1 or 0, preserving only the data for modified cells.
 
@@ -304,4 +357,54 @@ function setIconString(iconInput: string): leaflet.DivIcon {
   return icon;
 }
 
+function startup() {
+  if (localStorage.getItem("playerToken") !== "NaN") {
+    currentPlayerData.token_held = {
+      value: Number(localStorage.getItem("playerToken")!),
+    };
+  }
+
+  if (localStorage.getItem("cellsMap")) {
+    const loadedCellsMap: Array<string> = JSON.parse(
+      localStorage.getItem("cellsMap")!,
+    );
+
+    for (const entry of loadedCellsMap.entries()) {
+      let tokenValue = JSON.parse(entry[1]).value;
+      if (JSON.parse(entry[1]).value === undefined) {
+        console.log("undefined token value");
+        tokenValue = " ";
+      }
+
+      if ((tokenValue !== 0) && (tokenValue !== " ")) {
+        const cellPosition = LatLngFromString(JSON.parse(entry[1]).key);
+        const restoredCell = createCell(cellPosition, tokenValue);
+        const key = `${restoredCell.position.lat},${restoredCell.position.lng}`;
+        cellsMap.set(key, restoredCell);
+      } else if (tokenValue === " ") {
+        console.log("restoring empty cell");
+        const cellPosition = LatLngFromString(JSON.parse(entry[1]).key);
+        const restoredCell = createCell(cellPosition, -1);
+        const key = `${restoredCell.position.lat},${restoredCell.position.lng}`;
+        cellsMap.set(key, restoredCell);
+      }
+    }
+    console.log(cellsMap);
+    dispatchEvent(tokenChangedEvent);
+  }
+}
+
+function LatLngFromString(latlngString: string): leaflet.LatLng {
+  const parts = latlngString.split(",");
+  console.log("string: " + latlngString);
+  const lat = parseFloat(parts[0]);
+  console.log("lat: " + lat.toString());
+  const lng = parseFloat(parts[1]);
+  console.log("lng: " + lng.toString());
+  return leaflet.latLng(lat, lng);
+}
+startup();
 spawnCellsLocation();
+
+delete currentPlayerData.token_held;
+dispatchEvent(tokenChangedEvent);
