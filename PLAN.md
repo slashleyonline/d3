@@ -38,6 +38,6 @@ Key gameplay challenge: Can players collect and craft tokens from nearby locatio
 - [x] transfer event listener from "move" to "moveend"
 - [x] use flyweight to reduce memory load
 - [x] use memento to preserve cells to reduce performance load
-- [ ] preserve inventory data between playsessions
+- [x] preserve inventory data between playsessions
 - [x] preserve map data between playsessions
-- [ ] geolocation movement
+- [x] geolocation movement

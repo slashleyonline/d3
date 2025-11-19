@@ -403,8 +403,26 @@ function LatLngFromString(latlngString: string): leaflet.LatLng {
   console.log("lng: " + lng.toString());
   return leaflet.latLng(lat, lng);
 }
+
+const GEOLOC = navigator.geolocation;
+
+function playerMove(pos: GeolocationPosition) {
+  const newPlayerLatLng = leaflet.latLng(
+    pos.coords.latitude,
+    pos.coords.longitude,
+  );
+  currentPlayerData.moveTo(newPlayerLatLng);
+  map.setView(newPlayerLatLng);
+}
+
+function MoveCall() {
+  GEOLOC.getCurrentPosition(playerMove);
+}
+
 startup();
 spawnCellsLocation();
 
 delete currentPlayerData.token_held;
 dispatchEvent(tokenChangedEvent);
+
+requestAnimationFrame(MoveCall);
