@@ -473,10 +473,8 @@ async function requestLocation() {
 }
 
 function MoveCall() {
+  console.log("call!");
   requestLocation();
-  if (manualMovement == true) {
-    setTimeout(MoveCall, 3000);
-  }
 }
 
 startup();
@@ -485,3 +483,4 @@ spawnCellsLocation();
 dispatchEvent(tokenChangedEvent);
 
 MoveCall();
+navigator.geolocation.watchPosition(MoveCall);
