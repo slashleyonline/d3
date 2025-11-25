@@ -464,9 +464,11 @@ spawnCellsLocation();
 dispatchEvent(tokenChangedEvent);
 
 MoveCall();
+const testDiv = document.createElement("div");
 
 if (!navigator.geolocation) {
-  document.append("geolocation not supported on this phone!");
+  testDiv.innerHTML = "geolocation not supported on this phone!";
 } else {
-  document.append("geolocation suppported!");
+  testDiv.innerHTML = "geolocation suppported!";
 }
+mainDiv.append(testDiv);
