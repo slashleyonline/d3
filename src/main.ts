@@ -467,4 +467,6 @@ MoveCall();
 
 if (!navigator.geolocation) {
   document.append("geolocation not supported on this phone!");
+} else {
+  document.append("geolocation suppported!");
 }
