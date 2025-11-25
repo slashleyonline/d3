@@ -381,6 +381,7 @@ function startup() {
     currentPlayerData.token_held = {
       value: Number(localStorage.getItem("playerToken")!),
     };
+    requestLocation();
   }
 
   if (localStorage.getItem("cellsMap")) {
@@ -463,3 +464,7 @@ spawnCellsLocation();
 dispatchEvent(tokenChangedEvent);
 
 MoveCall();
+
+if (!navigator.geolocation) {
+  document.append("geolocation not supported on this phone!");
+}
