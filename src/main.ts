@@ -456,6 +456,7 @@ async function requestLocation() {
 function MoveCall() {
   requestLocation();
   setTimeout(MoveCall, 3000);
+  mainDiv.append(testDiv);
 }
 
 startup();
