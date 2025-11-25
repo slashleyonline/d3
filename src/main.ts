@@ -48,6 +48,22 @@ centerMapButton.addEventListener("click", () => {
 });
 mainDiv.append(centerMapButton);
 
+const switchMovementButton = document.createElement("button");
+switchMovementButton.innerHTML = "geolocation -> manual";
+mainDiv.append(switchMovementButton);
+switchMovementButton.addEventListener("click", () => {
+  if ((debugMode === false) && (manualMovement === true)) {
+    switchMovementButton.innerHTML = "geolocation -> manual";
+    debugMode = true;
+    manualMovement = false;
+  } else {
+    switchMovementButton.innerHTML = "manual -> geolocation";
+    MoveCall();
+    debugMode = false;
+    manualMovement = true;
+  }
+});
+
 // Our classroom location
 const CLASSROOM_LATLNG = leaflet.latLng(
   36.997936938057016,
@@ -61,7 +77,9 @@ const GAMEPLAY_ZOOM_LEVEL = 19;
 const WIN_SCORE = 16; // temporary, will move to 256 later
 
 // Debug mode flag - when true, player position follows map center
-const debugMode = false;
+let debugMode = false;
+
+let manualMovement = true;
 
 //const CACHE_SPAWN_PROBABILITY = 0.1;
 
@@ -438,6 +456,7 @@ function playerMove(pos: GeolocationPosition) {
 
 async function requestLocation() {
   const result = await navigator.permissions.query({ name: "geolocation" });
+
   if ((result.state === "granted") || (result.state === "prompt")) {
     console.log("Asking for location...");
     navigator.geolocation.getCurrentPosition(
@@ -455,7 +474,9 @@ async function requestLocation() {
 
 function MoveCall() {
   requestLocation();
-  setTimeout(MoveCall, 3000);
+  if (manualMovement == true) {
+    setTimeout(MoveCall, 3000);
+  }
 }
 
 startup();
@@ -464,11 +485,3 @@ spawnCellsLocation();
 dispatchEvent(tokenChangedEvent);
 
 MoveCall();
-const testDiv = document.createElement("div");
-
-if (!navigator.geolocation) {
-  testDiv.innerHTML = "geolocation not supported on this phone!";
-} else {
-  testDiv.innerHTML = "geolocation suppported!";
-}
-mainDiv.append(testDiv);
