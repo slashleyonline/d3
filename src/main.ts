@@ -162,7 +162,7 @@ addEventListener("tokenChanged", () => {
             value: cell.token?.value,
             key: key,
           };
-          console.log("key is " + key);
+          //console.log("key is " + key);
           return JSON.stringify(value);
         }),
       ),
@@ -282,16 +282,19 @@ function addCellEventListener(inputCell: MapCell) {
     if (
       currentPlayerData.marker.getLatLng().distanceTo(
         inputCell.rect!.getBounds().getCenter(),
-      ) < 25
+      ) < 15
     ) {
       if (
-        (inputCell.token !== undefined) &&
-        (currentPlayerData.token_held === undefined)
+        ((inputCell.token !== undefined) &&
+          ((currentPlayerData.token_held === undefined) ||
+            (currentPlayerData.token_held.value == 0)))
       ) {
         transferTokenToPlayer(inputCell);
       } else {
         transferTokenToCell(inputCell);
       }
+    } else {
+      console.log("too far!");
     }
     dispatchEvent(tokenChangedEvent);
   });
@@ -322,8 +325,11 @@ function spawnCellsLocation() {
 
 function transferTokenToPlayer(cell: MapCell) {
   if (
-    (cell.token !== undefined) && (currentPlayerData.token_held === undefined)
+    (cell.token !== undefined) &&
+    ((currentPlayerData.token_held === undefined) ||
+      currentPlayerData.token_held.value == 0)
   ) {
+    console.log("cell token: " + cell.token.value);
     //transfer token from cell to player
     currentPlayerData.token_held = { value: cell.token.value };
     if (currentPlayerData.token_held.value >= WIN_SCORE) {
@@ -473,8 +479,10 @@ async function requestLocation() {
 }
 
 function MoveCall() {
-  console.log("call!");
-  requestLocation();
+  if (manualMovement) {
+    console.log("call!");
+    requestLocation();
+  }
 }
 
 startup();
