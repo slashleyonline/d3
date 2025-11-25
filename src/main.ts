@@ -415,8 +415,6 @@ function LatLngFromString(latlngString: string): leaflet.LatLng {
   return leaflet.latLng(lat, lng);
 }
 
-const GEOLOC = navigator.geolocation;
-
 function playerMove(pos: GeolocationPosition) {
   const newPlayerLatLng = leaflet.latLng(
     pos.coords.latitude,
@@ -432,7 +430,17 @@ function playerMove(pos: GeolocationPosition) {
 async function requestLocation() {
   const result = await navigator.permissions.query({ name: "geolocation" });
   if ((result.state === "granted") || (result.state === "prompt")) {
-    GEOLOC.getCurrentPosition(playerMove);
+    console.log("Asking for location...");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        coordsDiv.innerHTML = "Got position: " + pos.coords.latitude +
+          pos.coords.longitude;
+        playerMove(pos);
+      },
+      (err) => {
+        coordsDiv.innerHTML = "Geolocation error: " + err;
+      },
+    );
   }
 }
 
