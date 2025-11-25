@@ -36,6 +36,10 @@ winnerDiv.style.color = "red";
 winnerDiv.style.display = "none";
 mainDiv.append(winnerDiv);
 
+const coordsDiv = document.createElement("div");
+coordsDiv.id = "coordsDiv";
+mainDiv.append(coordsDiv);
+
 // Our classroom location
 const CLASSROOM_LATLNG = leaflet.latLng(
   36.997936938057016,
@@ -49,7 +53,7 @@ const GAMEPLAY_ZOOM_LEVEL = 19;
 const WIN_SCORE = 16; // temporary, will move to 256 later
 
 // Debug mode flag - when true, player position follows map center
-const debugMode = true;
+const debugMode = false;
 
 //const CACHE_SPAWN_PROBABILITY = 0.1;
 
@@ -97,6 +101,11 @@ map.addEventListener("move", () => {
   }
   removeCellsOutsideView();
   spawnCellsLocation();
+  coordsDiv.innerHTML = `Lat: ${
+    currentPlayerData.position.lat.toFixed(
+      6,
+    )
+  }, Lng: ${currentPlayerData.position.lng.toFixed(6)}`;
 });
 
 addEventListener("tokenChanged", () => {
