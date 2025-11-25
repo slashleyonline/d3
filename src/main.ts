@@ -95,6 +95,8 @@ const map: leaflet.Map = mapSetup();
 //Dictionary of all map cells onscreen, preserving only modified cells
 const cellsMap = new Map<string, MapCell>();
 
+let centered = false;
+
 map.addEventListener("move", () => {
   if (debugMode) {
     currentPlayerData.moveTo(map.getCenter());
@@ -421,12 +423,22 @@ function playerMove(pos: GeolocationPosition) {
     pos.coords.longitude,
   );
   currentPlayerData.moveTo(newPlayerLatLng);
-  //map.setView(newPlayerLatLng);
+  if (!centered) {
+    map.setView(newPlayerLatLng, GAMEPLAY_ZOOM_LEVEL);
+    centered = true;
+  }
+}
+
+async function requestLocation() {
+  const result = await navigator.permissions.query({ name: "geolocation" });
+  if ((result.state === "granted") || (result.state === "prompt")) {
+    GEOLOC.getCurrentPosition(playerMove);
+  }
 }
 
 function MoveCall() {
-  GEOLOC.getCurrentPosition(playerMove);
-  requestAnimationFrame(MoveCall);
+  requestLocation();
+  setTimeout(MoveCall, 3000);
 }
 
 startup();
