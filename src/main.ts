@@ -426,12 +426,12 @@ function playerMove(pos: GeolocationPosition) {
 
 function MoveCall() {
   GEOLOC.getCurrentPosition(playerMove);
+  requestAnimationFrame(MoveCall);
 }
 
 startup();
 spawnCellsLocation();
 
-delete currentPlayerData.token_held;
 dispatchEvent(tokenChangedEvent);
 
 requestAnimationFrame(MoveCall);
