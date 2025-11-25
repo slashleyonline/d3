@@ -1,4 +1,4 @@
-//D3.C COMPLETE!!!!
+//D3.D COMPLETE!!!!
 
 // @deno-types="npm:@types/leaflet"
 import leaflet from "leaflet";
@@ -53,16 +53,24 @@ switchMovementButton.innerHTML = "geolocation -> manual";
 mainDiv.append(switchMovementButton);
 switchMovementButton.addEventListener("click", () => {
   if ((debugMode === false) && (manualMovement === true)) {
-    switchMovementButton.innerHTML = "geolocation -> manual";
+    switchMovementButton.innerHTML = "manual -> geolocation";
     debugMode = true;
     manualMovement = false;
   } else {
-    switchMovementButton.innerHTML = "manual -> geolocation";
+    switchMovementButton.innerHTML = "geolocation -> manual";
     MoveCall();
     debugMode = false;
     manualMovement = true;
   }
 });
+
+const resetButton = document.createElement("button");
+resetButton.addEventListener("click", () => {
+  console.log("reset!");
+  resetMap();
+});
+resetButton.innerHTML = "reset";
+mainDiv.append(resetButton);
 
 // Our classroom location
 const CLASSROOM_LATLNG = leaflet.latLng(
@@ -239,7 +247,6 @@ function createCell(
   };
 
   if (tokenValue === -1) {
-    console.log("this time im really gonna do it");
     delete newCell.token;
     newCell.rect = createRectangle(inputPosition);
     newCell.label = createIcon(
@@ -329,7 +336,6 @@ function transferTokenToPlayer(cell: MapCell) {
     ((currentPlayerData.token_held === undefined) ||
       currentPlayerData.token_held.value == 0)
   ) {
-    console.log("cell token: " + cell.token.value);
     //transfer token from cell to player
     currentPlayerData.token_held = { value: cell.token.value };
     if (currentPlayerData.token_held.value >= WIN_SCORE) {
@@ -416,7 +422,6 @@ function startup() {
     for (const entry of loadedCellsMap.entries()) {
       let tokenValue = JSON.parse(entry[1]).value;
       if (JSON.parse(entry[1]).value === undefined) {
-        console.log("undefined token value");
         tokenValue = " ";
       }
 
@@ -426,7 +431,6 @@ function startup() {
         const key = `${restoredCell.position.lat},${restoredCell.position.lng}`;
         cellsMap.set(key, restoredCell);
       } else if (tokenValue === " ") {
-        console.log("restoring empty cell");
         const cellPosition = LatLngFromString(JSON.parse(entry[1]).key);
         const restoredCell = createCell(cellPosition, -1);
         const key = `${restoredCell.position.lat},${restoredCell.position.lng}`;
@@ -440,11 +444,8 @@ function startup() {
 
 function LatLngFromString(latlngString: string): leaflet.LatLng {
   const parts = latlngString.split(",");
-  console.log("string: " + latlngString);
   const lat = parseFloat(parts[0]);
-  console.log("lat: " + lat.toString());
   const lng = parseFloat(parts[1]);
-  console.log("lng: " + lng.toString());
   return leaflet.latLng(lat, lng);
 }
 
@@ -464,7 +465,6 @@ async function requestLocation() {
   const result = await navigator.permissions.query({ name: "geolocation" });
 
   if ((result.state === "granted") || (result.state === "prompt")) {
-    console.log("Asking for location...");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         coordsDiv.innerHTML = "Got position: " + pos.coords.latitude +
@@ -482,6 +482,15 @@ function MoveCall() {
   if (manualMovement) {
     console.log("call!");
     requestLocation();
+  }
+}
+
+function resetMap() {
+  if (currentPlayerData.token_held) {
+    currentPlayerData.token_held.value = 0;
+    cellsMap.clear();
+    localStorage.clear();
+    globalThis.location.reload();
   }
 }
 
