@@ -40,6 +40,14 @@ const coordsDiv = document.createElement("div");
 coordsDiv.id = "coordsDiv";
 mainDiv.append(coordsDiv);
 
+const centerMapButton = document.createElement("button");
+centerMapButton.id = "centerMapButton";
+centerMapButton.innerHTML = "Center Map on Player";
+centerMapButton.addEventListener("click", () => {
+  map.setView(currentPlayerData.position, GAMEPLAY_ZOOM_LEVEL);
+});
+mainDiv.append(centerMapButton);
+
 // Our classroom location
 const CLASSROOM_LATLNG = leaflet.latLng(
   36.997936938057016,
