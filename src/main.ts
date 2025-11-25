@@ -421,7 +421,7 @@ function playerMove(pos: GeolocationPosition) {
     pos.coords.longitude,
   );
   currentPlayerData.moveTo(newPlayerLatLng);
-  map.setView(newPlayerLatLng);
+  //map.setView(newPlayerLatLng);
 }
 
 function MoveCall() {
@@ -434,4 +434,4 @@ spawnCellsLocation();
 
 dispatchEvent(tokenChangedEvent);
 
-requestAnimationFrame(MoveCall);
+MoveCall();
